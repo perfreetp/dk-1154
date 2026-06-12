@@ -216,7 +216,9 @@ const MessagePage: React.FC = () => {
 
               {msg.type === 'invite' && msg.fromUserId && (
                 <View className={styles.statusBtn} onClick={(e) => handleStatusClick(msg, e)}>
-                  <Text className={styles.statusBtnText}>状态</Text>
+                  <Text className={styles.statusBtnText}>
+                    {msg.data?.source === 'invitation' ? '已邀请' : '已申请'}
+                  </Text>
                 </View>
               )}
 

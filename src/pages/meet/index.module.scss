@@ -142,3 +142,37 @@
   font-weight: $font-weight-semibold;
   color: $color-text-white;
 }
+
+.candidateBanner {
+  background: $color-bg-card;
+  margin: 0 $page-padding $spacing-md;
+  padding: $spacing-lg;
+  border-radius: $radius-lg;
+  display: flex;
+  align-items: center;
+  box-shadow: $shadow-card;
+}
+
+.candidateAvatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: $radius-round;
+  margin-right: $spacing-lg;
+}
+
+.candidateInfo {
+  flex: 1;
+}
+
+.candidateName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.candidateHint {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}

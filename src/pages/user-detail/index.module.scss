@@ -177,3 +177,99 @@
   background: $gradient-primary;
   color: $color-text-white;
 }
+
+.projectSelectorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: $gradient-primary;
+  padding: calc(env(safe-area-inset-top) + 20rpx) $page-padding $spacing-lg;
+}
+
+.closeBtn {
+  @include button-reset;
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.selectorTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+}
+
+.projectList {
+  height: calc(100vh - 120rpx);
+  padding: $spacing-md $page-padding;
+}
+
+.projectItem {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+  box-shadow: $shadow-card;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.projectInfo {
+  flex: 1;
+}
+
+.projectTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.projectMeta {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.selectIcon {
+  font-size: 40rpx;
+  color: $color-primary;
+  margin-left: $spacing-md;
+}
+
+.selectedProjectBanner {
+  background: rgba($color-primary, 0.1);
+  padding: $spacing-md $page-padding;
+  margin: 0 $page-padding $spacing-md;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.bannerLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.bannerTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+  flex: 1;
+}
+
+.changeBtn {
+  @include button-reset;
+  padding: 6rpx 16rpx;
+  background: $color-primary;
+  color: $color-text-white;
+  border-radius: $radius-button;
+  font-size: $font-size-xs;
+}

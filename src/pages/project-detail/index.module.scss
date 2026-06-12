@@ -373,3 +373,271 @@
   height: 12rpx;
   border-radius: $radius-round;
 }
+
+.candidateList {
+  margin-top: $spacing-md;
+}
+
+.candidateCard {
+  background: $color-bg-hover;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.candidateInfo {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.candidateDetail {
+  flex: 1;
+  margin-left: $spacing-md;
+}
+
+.candidateName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.candidateCollege {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.intendedRole {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  display: block;
+}
+
+.nextMeetTime {
+  background: rgba($color-primary, 0.1);
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-sm;
+  margin-bottom: $spacing-sm;
+}
+
+.candidateStatus {
+  display: inline-block;
+  font-size: $font-size-xs;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+  border: 2rpx solid;
+  background: rgba(255, 255, 255, 0.5);
+  margin-left: $spacing-sm;
+}
+
+.candidateActions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.meetBtn,
+.viewBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-sm;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+.meetBtn {
+  background: $color-primary;
+  color: $color-text-white;
+}
+
+.viewBtn {
+  background: $color-bg-card;
+  color: $color-text-primary;
+  border: 2rpx solid $color-border;
+}
+
+.emptyState {
+  text-align: center;
+  padding: $spacing-xl 0;
+}
+
+.emptyText {
+  color: $color-text-tertiary;
+  font-size: $font-size-md;
+  display: block;
+  margin-bottom: $spacing-lg;
+}
+
+.inviteBtn {
+  @include button-reset;
+  padding: $spacing-md $spacing-xl;
+  background: $gradient-primary;
+  color: $color-text-white;
+  border-radius: $radius-button;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+}
+
+.candidateCount {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.detailContent {
+  height: calc(100vh - 120rpx);
+  padding: $spacing-md $page-padding;
+}
+
+.candidateDetailCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.candidateDetailHeader {
+  display: flex;
+  align-items: center;
+  padding-bottom: $spacing-lg;
+  border-bottom: 1rpx solid $color-border;
+  margin-bottom: $spacing-lg;
+}
+
+.candidateDetailInfo {
+  flex: 1;
+  margin-left: $spacing-lg;
+}
+
+.candidateAvatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: $radius-round;
+}
+
+.sourceTag {
+  background: rgba($color-primary, 0.1);
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+  display: inline-block;
+  margin-top: $spacing-xs;
+}
+
+.candidateDetailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-sm 0;
+}
+
+.detailLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.detailValue {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.statusBadge {
+  font-size: $font-size-sm;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+  border: 2rpx solid;
+}
+
+.detailSectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: $spacing-md;
+}
+
+.statusGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-sm;
+}
+
+.statusOption {
+  padding: $spacing-md;
+  text-align: center;
+  border-radius: $radius-md;
+  border: 2rpx solid;
+  background: $color-bg-hover;
+  transition: all $transition-base;
+}
+
+.roleSelector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.roleOption {
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-button;
+  background: $color-bg-hover;
+  border: 2rpx solid $color-border;
+  transition: all $transition-base;
+
+  &.active {
+    border-color: $color-primary;
+    background: rgba($color-primary, 0.1);
+    color: $color-primary;
+  }
+}
+
+.noteInput {
+  width: 100%;
+}
+
+.noteInputField {
+  width: 100%;
+  padding: $spacing-md;
+  border: 2rpx solid $color-border;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  background: $color-bg-hover;
+
+  &:focus {
+    border-color: $color-primary;
+  }
+}
+
+.meetingInfo {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.meetingTime,
+.meetingLocation {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.scheduleBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-lg;
+  background: $gradient-primary;
+  color: $color-text-white;
+  border-radius: $radius-button;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  margin-top: $spacing-md;
+}

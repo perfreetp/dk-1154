@@ -11,10 +11,25 @@ const STORAGE_KEYS = {
   CHAT_MESSAGES: 'chat_messages',
   CANDIDATE_STATUS: 'candidate_status',
   CURRENT_USER: 'current_user',
-  APPLICATIONS: 'project_applications'
+  APPLICATIONS: 'project_applications',
+  MEETINGS: 'project_meetings'
 };
 
+export interface Meeting {
+  id: string;
+  projectId: string;
+  candidateId: string;
+  candidateName: string;
+  candidateAvatar: string;
+  meetTime: string;
+  location?: string;
+  topic?: string;
+  createdAt: string;
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+}
+
 export type CandidateStatus = 'uncontacted' | 'preliminary' | 'deep' | 'teamed';
+export type CandidateSource = 'application' | 'invitation';
 
 export interface Application {
   id: string;
@@ -26,6 +41,10 @@ export interface Application {
   applyTime: string;
   status: CandidateStatus;
   message?: string;
+  source?: CandidateSource;
+  note?: string;
+  intendedRole?: string;
+  nextMeetTime?: string;
 }
 
 export interface CandidateStatusRecord {
@@ -301,6 +320,31 @@ class Store {
     }
   }
 
+  async updateCandidateInfo(
+    projectId: string,
+    applicantId: string,
+    updates: {
+      note?: string;
+      intendedRole?: string;
+      nextMeetTime?: string;
+    }
+  ): Promise<void> {
+    const applications = await this.getApplications(projectId);
+    const index = applications.findIndex(a => a.applicantId === applicantId);
+    if (index !== -1) {
+      if (updates.note !== undefined) {
+        applications[index].note = updates.note;
+      }
+      if (updates.intendedRole !== undefined) {
+        applications[index].intendedRole = updates.intendedRole;
+      }
+      if (updates.nextMeetTime !== undefined) {
+        applications[index].nextMeetTime = updates.nextMeetTime;
+      }
+      await this.saveApplications(projectId, applications);
+    }
+  }
+
   async getApplicantInfo(applicantId: string): Promise<{name: string; avatar: string; college: string} | null> {
     const users = mockUsers;
     const user = users.find(u => u.id === applicantId);
@@ -321,7 +365,52 @@ class Store {
   generateId(): string {
     return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
+
+  async getMeetings(projectId?: string): Promise<Meeting[]> {
+    try {
+      const res = await Taro.getStorage({ key: STORAGE_KEYS.MEETINGS });
+      const meetings: Meeting[] = res.data || [];
+      if (projectId) {
+        return meetings.filter(m => m.projectId === projectId);
+      }
+      return meetings;
+    } catch {
+      return [];
+    }
+  }
+
+  async addMeeting(meeting: Meeting): Promise<void> {
+    const meetings = await this.getMeetings();
+    meetings.push(meeting);
+    await Taro.setStorage({ key: STORAGE_KEYS.MEETINGS, data: meetings });
+    
+    const applications = await this.getApplications(meeting.projectId);
+    const appIndex = applications.findIndex(a => a.applicantId === meeting.candidateId);
+    if (appIndex !== -1) {
+      applications[appIndex].nextMeetTime = meeting.meetTime;
+      await this.saveApplications(meeting.projectId, applications);
+    }
+  }
+
+  async getLatestMeeting(projectId: string, candidateId: string): Promise<Meeting | null> {
+    const meetings = await this.getMeetings(projectId);
+    const filtered = meetings.filter(m => m.candidateId === candidateId);
+    if (filtered.length === 0) return null;
+    return filtered.sort((a, b) => 
+      new Date(b.meetTime).getTime() - new Date(a.meetTime).getTime()
+    )[0];
+  }
+
+  async updateMeetingStatus(meetingId: string, status: Meeting['status']): Promise<void> {
+    const meetings = await this.getMeetings();
+    const index = meetings.findIndex(m => m.id === meetingId);
+    if (index !== -1) {
+      meetings[index].status = status;
+      await Taro.setStorage({ key: STORAGE_KEYS.MEETINGS, data: meetings });
+    }
+  }
 }
 
 export const store = new Store();
 export default store;
+export { Meeting };

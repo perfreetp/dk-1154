@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { View, Text, Input, Button, Picker } from '@tarojs/components';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Input, Button, Picker, Image } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
+import { store, Meeting } from '../../store';
 import styles from './index.module.scss';
 
 const MeetPage: React.FC = () => {
@@ -11,6 +12,10 @@ const MeetPage: React.FC = () => {
     location: '',
     note: ''
   });
+  const [projectId, setProjectId] = useState<string>('');
+  const [candidateId, setCandidateId] = useState<string>('');
+  const [candidateName, setCandidateName] = useState<string>('');
+  const [candidateAvatar, setCandidateAvatar] = useState<string>('');
 
   const locations = [
     '大学生活动中心',
@@ -26,7 +31,15 @@ const MeetPage: React.FC = () => {
     '18:00', '19:00', '20:00', '21:00'
   ];
 
-  const handleSubmit = () => {
+  useEffect(() => {
+    const { projectId: pId, candidateId: cId, candidateName: cName, candidateAvatar: cAvatar } = router.params;
+    if (pId) setProjectId(pId);
+    if (cId) setCandidateId(cId);
+    if (cName) setCandidateName(decodeURIComponent(cName));
+    if (cAvatar) setCandidateAvatar(decodeURIComponent(cAvatar));
+  }, [router.params]);
+
+  const handleSubmit = async () => {
     if (!formData.date) {
       Taro.showToast({ title: '请选择日期', icon: 'none' });
       return;
@@ -37,20 +50,63 @@ const MeetPage: React.FC = () => {
     }
 
     Taro.showLoading({ title: '发送邀约中...' });
-    setTimeout(() => {
+
+    try {
+      const meetTime = `${formData.date} ${formData.time}:00`;
+
+      const meeting: Meeting = {
+        id: store.generateId(),
+        projectId: projectId,
+        candidateId: candidateId,
+        candidateName: candidateName,
+        candidateAvatar: candidateAvatar,
+        meetTime: new Date(meetTime).toISOString(),
+        location: formData.location,
+        topic: formData.note,
+        createdAt: new Date().toISOString(),
+        status: 'pending'
+      };
+
+      await store.addMeeting(meeting);
+
       Taro.hideLoading();
       Taro.showToast({
         title: '邀约已发送',
         icon: 'success'
       });
+
       setTimeout(() => {
-        Taro.navigateBack();
+        if (projectId) {
+          Taro.navigateBack();
+        } else {
+          Taro.switchTab({ url: '/pages/message/index' });
+        }
       }, 1500);
-    }, 1000);
+    } catch (error) {
+      Taro.hideLoading();
+      Taro.showToast({
+        title: '发送失败',
+        icon: 'none'
+      });
+    }
   };
 
   return (
     <View className={styles.page}>
+      {candidateId && (
+        <View className={styles.candidateBanner}>
+          <Image
+            src={candidateAvatar}
+            className={styles.candidateAvatar}
+            mode='aspectFill'
+          />
+          <View className={styles.candidateInfo}>
+            <Text className={styles.candidateName}>{candidateName}</Text>
+            <Text className={styles.candidateHint}>即将与您碰面</Text>
+          </View>
+        </View>
+      )}
+
       <View className={styles.section}>
         <Text className={styles.label}>选择日期</Text>
         <Picker
