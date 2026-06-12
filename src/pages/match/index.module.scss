@@ -1,0 +1,187 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $gradient-bg;
+}
+
+.header {
+  background: $gradient-primary;
+  padding: $spacing-lg $page-padding;
+  padding-top: calc(env(safe-area-inset-top) + 20rpx);
+}
+
+.title {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.subtitle {
+  font-size: $font-size-sm;
+  color: rgba($color-text-white, 0.9);
+}
+
+.filters {
+  padding: $spacing-md $page-padding;
+  background: $color-bg-card;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.filterGroup {
+  margin-bottom: $spacing-md;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.filterLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+  margin-bottom: $spacing-sm;
+  display: block;
+}
+
+.filterScroll {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.filterTag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 100rpx;
+  height: 56rpx;
+  padding: 0 $spacing-md;
+  margin-right: $spacing-sm;
+  background: $color-bg-hover;
+  border-radius: $radius-button;
+  border: 2rpx solid transparent;
+  transition: all $transition-base;
+
+  &.active {
+    background: $gradient-primary;
+    border-color: transparent;
+
+    .filterText {
+      color: $color-text-white;
+    }
+  }
+}
+
+.filterText {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  white-space: nowrap;
+}
+
+.userList {
+  height: calc(100vh - 450rpx);
+}
+
+.userCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.userHeader {
+  display: flex;
+  margin-bottom: $spacing-md;
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: $radius-round;
+  margin-right: $spacing-md;
+}
+
+.userInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+}
+
+.userName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-right: $spacing-sm;
+}
+
+.rating {
+  font-size: $font-size-xs;
+  color: $color-warning;
+}
+
+.meta {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-bottom: 4rpx;
+}
+
+.hours {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-md;
+}
+
+.skillTag {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  background: rgba($color-primary, 0.1);
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+}
+
+.bio {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+  margin-bottom: $spacing-md;
+  @include text-ellipsis-multi(2);
+}
+
+.actions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.inviteBtn,
+.viewBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-sm;
+  background: $gradient-primary;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  color: $color-text-white;
+}
+
+.viewBtn {
+  background: $color-bg-hover;
+  color: $color-text-secondary;
+}

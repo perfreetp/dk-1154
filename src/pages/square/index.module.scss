@@ -1,0 +1,50 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $gradient-bg;
+}
+
+.header {
+  background: $gradient-primary;
+  padding: $spacing-lg $page-padding;
+  padding-top: calc(env(safe-area-inset-top) + 20rpx);
+}
+
+.title {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  margin-bottom: $spacing-md;
+}
+
+.content {
+  padding: $spacing-md 0;
+  padding-bottom: 120rpx;
+}
+
+.publishBtn {
+  position: fixed;
+  right: $spacing-lg;
+  bottom: 120rpx;
+  width: 120rpx;
+  height: 120rpx;
+  background: $gradient-primary;
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba($color-primary, 0.4);
+  z-index: 100;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.btnText {
+  font-size: 60rpx;
+  color: $color-text-white;
+  font-weight: $font-weight-bold;
+}

@@ -1,0 +1,178 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $gradient-bg;
+}
+
+.header {
+  background: $gradient-primary;
+  padding: $spacing-lg $page-padding;
+  padding-top: calc(env(safe-area-inset-top) + 20rpx);
+}
+
+.title {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.subtitle {
+  font-size: $font-size-sm;
+  color: rgba($color-text-white, 0.9);
+}
+
+.filters {
+  display: flex;
+  gap: $spacing-sm;
+  padding: $spacing-md $page-padding;
+  background: $color-bg-card;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.filterBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64rpx;
+  background: $color-bg-hover;
+  border-radius: $radius-button;
+  transition: all $transition-base;
+
+  &.active {
+    background: $gradient-primary;
+
+    .filterText {
+      color: $color-text-white;
+    }
+  }
+}
+
+.filterText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.resourceList {
+  height: calc(100vh - 400rpx);
+}
+
+.resourceCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.typeTag {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  background: rgba($color-primary, 0.1);
+  padding: 4rpx 16rpx;
+  border-radius: $radius-xs;
+}
+
+.typeIcon {
+  font-size: $font-size-sm;
+}
+
+.typeText {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.organizer {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.resourceTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: $spacing-sm;
+}
+
+.description {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  display: block;
+  margin-bottom: $spacing-md;
+  line-height: $line-height-normal;
+}
+
+.infoGrid {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+  padding: $spacing-md;
+  background: $color-bg-hover;
+  border-radius: $radius-md;
+}
+
+.infoItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.infoLabel {
+  font-size: $font-size-sm;
+}
+
+.infoValue {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  flex: 1;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.progress {
+  flex: 1;
+  height: 8rpx;
+  background: $color-bg-hover;
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  background: $gradient-primary;
+  transition: width $transition-base;
+}
+
+.bookBtn {
+  @include button-reset;
+  min-width: 160rpx;
+  height: $button-height-sm;
+  background: $gradient-primary;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  color: $color-text-white;
+
+  &.booked {
+    background: $color-text-disabled;
+    color: $color-text-secondary;
+  }
+}

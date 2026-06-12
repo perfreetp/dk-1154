@@ -1,0 +1,44 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-md;
+}
+
+.scrollView {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120rpx;
+  height: 64rpx;
+  padding: 0 $spacing-md;
+  margin-right: $spacing-sm;
+  background: $color-bg-card;
+  border-radius: $radius-button;
+  border: 2rpx solid $color-border;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+  }
+
+  &.active {
+    background: $gradient-primary;
+    border-color: transparent;
+
+    .tagText {
+      color: $color-text-white;
+    }
+  }
+}
+
+.tagText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+}

@@ -1,0 +1,155 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-round;
+  margin-right: $spacing-sm;
+}
+
+.userText {
+  display: flex;
+  flex-direction: column;
+}
+
+.userName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+}
+
+.college {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.collectBtn {
+  @include button-reset;
+  width: 64rpx;
+  height: 64rpx;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.collectIcon,
+.collectedIcon {
+  font-size: 40rpx;
+}
+
+.title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: $spacing-sm;
+  @include text-ellipsis;
+}
+
+.description {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+  display: block;
+  margin-bottom: $spacing-md;
+  @include text-ellipsis-multi(2);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-md;
+}
+
+.tag {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  background: rgba($color-primary, 0.1);
+  padding: 4rpx 16rpx;
+  border-radius: $radius-xs;
+  white-space: nowrap;
+}
+
+.stageTag {
+  font-size: $font-size-xs;
+  color: $color-secondary;
+  background: rgba($color-secondary, 0.1);
+  padding: 4rpx 16rpx;
+  border-radius: $radius-xs;
+  white-space: nowrap;
+}
+
+.roles {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: $spacing-md;
+  gap: $spacing-xs;
+}
+
+.rolesTitle {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+}
+
+.role {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  background: $color-bg-hover;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: $spacing-sm;
+  border-top: 1rpx solid $color-divider;
+}
+
+.stats {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.stat {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.time {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}

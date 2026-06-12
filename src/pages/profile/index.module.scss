@@ -1,0 +1,214 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $gradient-bg;
+}
+
+.header {
+  background: $gradient-primary;
+  padding: $spacing-lg $page-padding;
+  padding-top: calc(env(safe-area-inset-top) + 20rpx);
+}
+
+.userCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  display: flex;
+  align-items: flex-start;
+  position: relative;
+  box-shadow: $shadow-card;
+}
+
+.avatar {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: $radius-round;
+  margin-right: $spacing-md;
+  border: 4rpx solid $color-text-white;
+}
+
+.userInfo {
+  flex: 1;
+}
+
+.userName {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.userMeta {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  display: block;
+  margin-bottom: $spacing-md;
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 $spacing-md;
+}
+
+.statValue {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+}
+
+.statLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.statDivider {
+  width: 1rpx;
+  height: 40rpx;
+  background: $color-border;
+}
+
+.editBtn {
+  @include button-reset;
+  position: absolute;
+  top: $spacing-md;
+  right: $spacing-md;
+  width: 100rpx;
+  height: 48rpx;
+  background: $color-bg-hover;
+  border-radius: $radius-button;
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.section {
+  margin: $spacing-md $page-padding;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: $spacing-md;
+}
+
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.skillTag {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  background: rgba($color-primary, 0.1);
+  padding: 8rpx 16rpx;
+  border-radius: $radius-xs;
+}
+
+.worksScroll {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.workCard {
+  display: inline-block;
+  width: 200rpx;
+  margin-right: $spacing-md;
+}
+
+.workImage {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: $radius-md;
+  margin-bottom: $spacing-sm;
+}
+
+.workTitle {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  display: block;
+  @include text-ellipsis;
+}
+
+.emptyWorks {
+  padding: $spacing-lg;
+  text-align: center;
+}
+
+.emptyText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.menuSection {
+  margin: $spacing-md $page-padding;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-card;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  padding: $spacing-lg $spacing-md;
+  border-bottom: 1rpx solid $color-divider;
+  transition: all $transition-base;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:active {
+    background: $color-bg-hover;
+  }
+}
+
+.menuIcon {
+  font-size: 40rpx;
+  margin-right: $spacing-md;
+}
+
+.menuLabel {
+  flex: 1;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.menuBadge {
+  min-width: 36rpx;
+  height: 36rpx;
+  background: $color-error;
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8rpx;
+  margin-right: $spacing-sm;
+}
+
+.menuCount {
+  font-size: $font-size-xs;
+  color: $color-text-white;
+  font-weight: $font-weight-semibold;
+}
+
+.menuArrow {
+  font-size: $font-size-xl;
+  color: $color-text-tertiary;
+}

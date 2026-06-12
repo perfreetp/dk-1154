@@ -1,0 +1,161 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $gradient-bg;
+}
+
+.header {
+  background: $gradient-primary;
+  padding: $spacing-lg $page-padding;
+  padding-top: calc(env(safe-area-inset-top) + 20rpx);
+  position: relative;
+}
+
+.title {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+}
+
+.badge {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 24rpx);
+  right: $page-padding;
+  min-width: 36rpx;
+  height: 36rpx;
+  background: $color-error;
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8rpx;
+}
+
+.badgeText {
+  font-size: $font-size-xs;
+  color: $color-text-white;
+  font-weight: $font-weight-semibold;
+}
+
+.tabs {
+  display: flex;
+  gap: $spacing-sm;
+  padding: $spacing-md $page-padding;
+  background: $color-bg-card;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64rpx;
+  background: $color-bg-hover;
+  border-radius: $radius-button;
+  transition: all $transition-base;
+
+  &.active {
+    background: $gradient-primary;
+
+    .tabText {
+      color: $color-text-white;
+    }
+  }
+}
+
+.tabText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.messageList {
+  height: calc(100vh - 350rpx);
+}
+
+.messageCard {
+  display: flex;
+  align-items: flex-start;
+  padding: $spacing-lg $page-padding;
+  background: $color-bg-card;
+  margin-bottom: $spacing-sm;
+  transition: all $transition-base;
+
+  &.unread {
+    background: rgba($color-primary, 0.05);
+    border-left: 4rpx solid $color-primary;
+  }
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.messageIcon {
+  position: relative;
+  width: 80rpx;
+  height: 80rpx;
+  background: $color-bg-hover;
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: $spacing-md;
+}
+
+.icon {
+  font-size: 40rpx;
+}
+
+.unreadDot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 16rpx;
+  height: 16rpx;
+  background: $color-error;
+  border-radius: $radius-round;
+  border: 2rpx solid $color-bg-card;
+}
+
+.messageContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.messageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+}
+
+.messageTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.messageTime {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  white-space: nowrap;
+  margin-left: $spacing-sm;
+}
+
+.messageText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+  @include text-ellipsis-multi(2);
+}
+
+.avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-round;
+  margin-left: $spacing-md;
+}

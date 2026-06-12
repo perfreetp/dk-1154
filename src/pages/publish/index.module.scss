@@ -1,0 +1,225 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $gradient-bg;
+}
+
+.form {
+  height: calc(100vh - 120rpx);
+  padding: $spacing-md 0;
+}
+
+.formItem {
+  background: $color-bg-card;
+  padding: $spacing-lg $page-padding;
+  margin-bottom: $spacing-md;
+}
+
+.label {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: $spacing-md;
+}
+
+.labelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.input,
+.textarea {
+  background: $color-bg-hover;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.textarea {
+  min-height: 200rpx;
+  text-align: left;
+}
+
+.stageGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.stageTag {
+  padding: 12rpx 24rpx;
+  background: $color-bg-hover;
+  border-radius: $radius-button;
+  border: 2rpx solid transparent;
+  transition: all $transition-base;
+
+  &.active {
+    background: $gradient-primary;
+    border-color: transparent;
+
+    .stageText {
+      color: $color-text-white;
+    }
+  }
+}
+
+.stageText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.collegeGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-sm;
+}
+
+.collegeTag {
+  padding: 16rpx;
+  background: $color-bg-hover;
+  border-radius: $radius-md;
+  border: 2rpx solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-base;
+
+  &.active {
+    background: rgba($color-primary, 0.1);
+    border-color: $color-primary;
+
+    .collegeText {
+      color: $color-primary;
+    }
+  }
+}
+
+.collegeText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  text-align: center;
+}
+
+.skillGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.skillTag {
+  padding: 8rpx 16rpx;
+  background: $color-bg-hover;
+  border-radius: $radius-xs;
+  border: 2rpx solid transparent;
+  transition: all $transition-base;
+
+  &.active {
+    background: rgba($color-primary, 0.1);
+    border-color: $color-primary;
+
+    .skillText {
+      color: $color-primary;
+    }
+  }
+}
+
+.skillText {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.addBtn {
+  @include button-reset;
+  padding: 8rpx 24rpx;
+  background: $color-primary;
+  border-radius: $radius-button;
+  font-size: $font-size-xs;
+  color: $color-text-white;
+}
+
+.roleRow {
+  background: $color-bg-hover;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-sm;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.roleInput {
+  flex: 1;
+  background: $color-bg-card;
+  border-radius: $radius-sm;
+  padding: 12rpx;
+  font-size: $font-size-sm;
+}
+
+.roleCount {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.roleLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.countControl {
+  display: flex;
+  align-items: center;
+  background: $color-bg-card;
+  border-radius: $radius-sm;
+}
+
+.countBtn {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-lg;
+  color: $color-primary;
+  font-weight: $font-weight-bold;
+}
+
+.countValue {
+  width: 48rpx;
+  text-align: center;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-semibold;
+}
+
+.removeBtn {
+  font-size: $font-size-xs;
+  color: $color-error;
+  padding: 8rpx;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: $spacing-md $page-padding;
+  background: $color-bg-card;
+  box-shadow: 0 -4rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.submitBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-lg;
+  background: $gradient-primary;
+  border-radius: $radius-button;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+}
