@@ -10,10 +10,23 @@ const STORAGE_KEYS = {
   MESSAGES: 'user_messages',
   CHAT_MESSAGES: 'chat_messages',
   CANDIDATE_STATUS: 'candidate_status',
-  CURRENT_USER: 'current_user'
+  CURRENT_USER: 'current_user',
+  APPLICATIONS: 'project_applications'
 };
 
 export type CandidateStatus = 'uncontacted' | 'preliminary' | 'deep' | 'teamed';
+
+export interface Application {
+  id: string;
+  projectId: string;
+  applicantId: string;
+  applicantName: string;
+  applicantAvatar: string;
+  applicantCollege: string;
+  applyTime: string;
+  status: CandidateStatus;
+  message?: string;
+}
 
 export interface CandidateStatusRecord {
   projectId: string;
@@ -29,6 +42,47 @@ class Store {
     const hasProjects = await this.getProjects();
     if (!hasProjects || hasProjects.length === 0) {
       await this.saveProjects(mockProjects);
+      const myProjects = hasProjects || mockProjects;
+      for (const project of myProjects) {
+        if (project.creatorId === this.currentUserId) {
+          const existingApps = await this.getApplications(project.id);
+          if (existingApps.length === 0) {
+            const sampleApplications: Application[] = [
+              {
+                id: this.generateId(),
+                projectId: project.id,
+                applicantId: 'user2',
+                applicantName: '李四',
+                applicantAvatar: 'https://picsum.photos/id/91/200/200',
+                applicantCollege: '软件学院',
+                applyTime: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'preliminary'
+              },
+              {
+                id: this.generateId(),
+                projectId: project.id,
+                applicantId: 'user3',
+                applicantName: '王五',
+                applicantAvatar: 'https://picsum.photos/id/177/200/200',
+                applicantCollege: '商学院',
+                applyTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'uncontacted'
+              },
+              {
+                id: this.generateId(),
+                projectId: project.id,
+                applicantId: 'user4',
+                applicantName: '赵六',
+                applicantAvatar: 'https://picsum.photos/id/338/200/200',
+                applicantCollege: '设计学院',
+                applyTime: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'deep'
+              }
+            ];
+            await this.saveApplications(project.id, sampleApplications);
+          }
+        }
+      }
     }
 
     const hasMessages = await this.getMessages();
@@ -204,6 +258,60 @@ class Store {
         status: 'active'
       });
     }
+  }
+
+  async getApplications(projectId: string): Promise<Application[]> {
+    try {
+      const res = await Taro.getStorage({ key: `${STORAGE_KEYS.APPLICATIONS}_${projectId}` });
+      return res.data || [];
+    } catch {
+      return [];
+    }
+  }
+
+  async saveApplications(projectId: string, applications: Application[]): Promise<void> {
+    await Taro.setStorage({
+      key: `${STORAGE_KEYS.APPLICATIONS}_${projectId}`,
+      data: applications
+    });
+  }
+
+  async addApplication(application: Application): Promise<void> {
+    const applications = await this.getApplications(application.projectId);
+    const existingIndex = applications.findIndex(a => a.applicantId === application.applicantId);
+    if (existingIndex === -1) {
+      applications.push(application);
+    } else {
+      applications[existingIndex] = application;
+    }
+    await this.saveApplications(application.projectId, applications);
+  }
+
+  async updateApplicationStatus(
+    projectId: string,
+    applicantId: string,
+    status: CandidateStatus
+  ): Promise<void> {
+    const applications = await this.getApplications(projectId);
+    const index = applications.findIndex(a => a.applicantId === applicantId);
+    if (index !== -1) {
+      applications[index].status = status;
+      await this.saveApplications(projectId, applications);
+      await this.updateCandidateStatus(projectId, applicantId, status);
+    }
+  }
+
+  async getApplicantInfo(applicantId: string): Promise<{name: string; avatar: string; college: string} | null> {
+    const users = mockUsers;
+    const user = users.find(u => u.id === applicantId);
+    if (user) {
+      return {
+        name: user.name,
+        avatar: user.avatar,
+        college: user.college
+      };
+    }
+    return null;
   }
 
   getCurrentUser() {

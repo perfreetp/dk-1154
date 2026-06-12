@@ -294,6 +294,19 @@
   margin-bottom: $spacing-xs;
 }
 
+.candidateCollege {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.applyTime {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  display: block;
+}
+
 .candidateStatus {
   display: inline-block;
   font-size: $font-size-xs;

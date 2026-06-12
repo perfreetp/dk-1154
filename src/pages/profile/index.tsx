@@ -21,12 +21,15 @@ const ProfilePage: React.FC = () => {
   ];
 
   useEffect(() => {
-    loadMyProjects();
+    store.init().then(() => {
+      loadMyProjects();
+    });
   }, []);
 
   const loadMyProjects = async () => {
     setLoading(true);
     try {
+      await store.checkExpiredProjects();
       const projects = await store.getMyProjects();
       setMyProjects(projects);
     } catch (error) {
@@ -68,7 +71,22 @@ const ProfilePage: React.FC = () => {
     });
   };
 
-  const handleShowProject = async (projectId: string) => {
+  const handleShowProject = async (projectId: string, expiredAt: string) => {
+    const expiredDate = new Date(expiredAt);
+    if (expiredDate < new Date()) {
+      Taro.showModal({
+        title: '项目已过期',
+        content: '该项目已过期，请先延长有效期后再恢复显示。',
+        confirmText: '延长有效期',
+        success: async (res) => {
+          if (res.confirm) {
+            handleExtendProject(projectId);
+          }
+        }
+      });
+      return;
+    }
+
     Taro.showModal({
       title: '确认恢复',
       content: '确定要恢复显示此项目吗？',
@@ -152,6 +170,9 @@ const ProfilePage: React.FC = () => {
                 <View className={styles.projectHeader}>
                   <View className={styles.projectInfo}>
                     <Text className={styles.projectTitle}>{project.title}</Text>
+                    {project.status === 'expired' && (
+                      <Text className={styles.expiredTag}>已过期</Text>
+                    )}
                     <Text style={{ ...styles.projectStatus, ...getStatusStyle(project.status) }}>
                       {getStatusText(project.status)}
                     </Text>
@@ -181,7 +202,7 @@ const ProfilePage: React.FC = () => {
                   {project.status === 'hidden' && (
                     <Button
                       className={styles.actionBtn}
-                      onClick={() => handleShowProject(project.id)}
+                      onClick={() => handleShowProject(project.id, project.expiredAt)}
                     >
                       恢复显示
                     </Button>

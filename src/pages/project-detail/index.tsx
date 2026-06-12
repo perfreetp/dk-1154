@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, Button, ScrollView } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import { Project, STAGE_OPTIONS } from '../../types/project';
-import { store, CandidateStatus } from '../../store';
+import { store, CandidateStatus, Application } from '../../store';
 import styles from './index.module.scss';
 
 const STATUS_OPTIONS: { value: CandidateStatus; label: string; color: string }[] = [
@@ -15,7 +15,7 @@ const STATUS_OPTIONS: { value: CandidateStatus; label: string; color: string }[]
 const ProjectDetailPage: React.FC = () => {
   const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
-  const [candidateStatuses, setCandidateStatuses] = useState<Record<string, CandidateStatus>>({});
+  const [applications, setApplications] = useState<Application[]>([]);
   const [showCandidatePanel, setShowCandidatePanel] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<string | null>(null);
 
@@ -24,8 +24,8 @@ const ProjectDetailPage: React.FC = () => {
   }, [router.params]);
 
   useEffect(() => {
-    if (project && router.params.candidateId) {
-      loadCandidateStatuses();
+    if (project) {
+      loadApplications();
     }
   }, [project, router.params.candidateId]);
 
@@ -38,18 +38,10 @@ const ProjectDetailPage: React.FC = () => {
     }
   };
 
-  const loadCandidateStatuses = async () => {
+  const loadApplications = async () => {
     if (!project) return;
-    const messages = await store.getMessages();
-    const candidates = messages.filter(m => m.data?.projectId === project.id && m.type === 'invite');
-    const statuses: Record<string, CandidateStatus> = {};
-    for (const msg of candidates) {
-      if (msg.fromUserId) {
-        const status = await store.getCandidateStatus(project.id, msg.fromUserId);
-        statuses[msg.fromUserId] = status;
-      }
-    }
-    setCandidateStatuses(statuses);
+    const apps = await store.getApplications(project.id);
+    setApplications(apps);
   };
 
   const handleCollect = async () => {
@@ -62,13 +54,34 @@ const ProjectDetailPage: React.FC = () => {
     });
   };
 
-  const handleApply = () => {
+  const handleApply = async () => {
     if (!project) return;
+    const currentUser = store.getCurrentUser();
+    const existingApps = await store.getApplications(project.id);
+    const alreadyApplied = existingApps.some(a => a.applicantId === currentUser.id);
+
+    if (alreadyApplied) {
+      Taro.showToast({ title: '您已申请过此项目', icon: 'none' });
+      return;
+    }
+
     Taro.showModal({
       title: '申请加入',
       content: `确定要申请加入"${project.title}"吗？`,
       success: async (res) => {
         if (res.confirm) {
+          const application: Application = {
+            id: store.generateId(),
+            projectId: project.id,
+            applicantId: currentUser.id,
+            applicantName: currentUser.name,
+            applicantAvatar: currentUser.avatar,
+            applicantCollege: currentUser.college,
+            applyTime: new Date().toISOString(),
+            status: 'uncontacted'
+          };
+          await store.addApplication(application);
+          await loadApplications();
           Taro.showToast({
             title: '申请已发送',
             icon: 'success'
@@ -85,10 +98,10 @@ const ProjectDetailPage: React.FC = () => {
     });
   };
 
-  const handleStatusChange = async (candidateId: string, status: CandidateStatus) => {
+  const handleStatusChange = async (applicantId: string, status: CandidateStatus) => {
     if (!project) return;
-    await store.updateCandidateStatus(project.id, candidateId, status);
-    setCandidateStatuses(prev => ({ ...prev, [candidateId]: status }));
+    await store.updateApplicationStatus(project.id, applicantId, status);
+    await loadApplications();
     Taro.showToast({
       title: '状态已更新',
       icon: 'success'
@@ -125,47 +138,60 @@ const ProjectDetailPage: React.FC = () => {
         </View>
 
         <ScrollView scrollY className={styles.candidateList}>
-          {Object.entries(candidateStatuses).map(([candidateId, status]) => {
-            const statusInfo = getStatusInfo(status);
-            return (
-              <View key={candidateId} className={styles.candidateCard}>
-                <View className={styles.candidateInfo}>
-                  <Image
-                    src={`https://picsum.photos/seed/${candidateId}/100/100`}
-                    className={styles.candidateAvatar}
-                    mode='aspectFill'
-                  />
-                  <View className={styles.candidateDetail}>
-                    <Text className={styles.candidateName}>候选人 {candidateId.slice(-4)}</Text>
-                    <View className={styles.candidateStatus} style={{ borderColor: statusInfo.color }}>
+          {applications.length > 0 ? (
+            applications.map(app => {
+              const statusInfo = getStatusInfo(app.status);
+              return (
+                <View key={app.applicantId} className={styles.candidateCard}>
+                  <View className={styles.candidateInfo}>
+                    <Image
+                      src={app.applicantAvatar}
+                      className={styles.candidateAvatar}
+                      mode='aspectFill'
+                    />
+                    <View className={styles.candidateDetail}>
+                      <Text className={styles.candidateName}>{app.applicantName}</Text>
+                      <Text className={styles.candidateCollege}>{app.applicantCollege}</Text>
+                      <Text className={styles.applyTime}>
+                        申请时间：{new Date(app.applyTime).toLocaleDateString('zh-CN')}
+                      </Text>
+                    </View>
+                    <View
+                      className={styles.candidateStatus}
+                      style={{ borderColor: statusInfo.color }}
+                    >
                       <Text style={{ color: statusInfo.color }}>{statusInfo.label}</Text>
                     </View>
                   </View>
-                </View>
 
-                {selectedCandidate === candidateId ? (
-                  <View className={styles.statusOptions}>
-                    {STATUS_OPTIONS.map(option => (
-                      <View
-                        key={option.value}
-                        className={styles.statusOption}
-                        onClick={() => handleStatusChange(candidateId, option.value)}
-                      >
-                        <Text style={{ color: option.color }}>{option.label}</Text>
-                      </View>
-                    ))}
-                  </View>
-                ) : (
-                  <Button
-                    className={styles.changeBtn}
-                    onClick={() => setSelectedCandidate(candidateId)}
-                  >
-                    修改状态
-                  </Button>
-                )}
-              </View>
-            );
-          })}
+                  {selectedCandidate === app.applicantId ? (
+                    <View className={styles.statusOptions}>
+                      {STATUS_OPTIONS.map(option => (
+                        <View
+                          key={option.value}
+                          className={styles.statusOption}
+                          onClick={() => handleStatusChange(app.applicantId, option.value)}
+                        >
+                          <Text style={{ color: option.color }}>{option.label}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  ) : (
+                    <Button
+                      className={styles.changeBtn}
+                      onClick={() => setSelectedCandidate(app.applicantId)}
+                    >
+                      修改状态
+                    </Button>
+                  )}
+                </View>
+              );
+            })
+          ) : (
+            <View style={{ textAlign: 'center', padding: '100rpx 0' }}>
+              <Text style={{ color: '#94A3B8' }}>暂无申请人</Text>
+            </View>
+          )}
         </ScrollView>
       </View>
     );
@@ -228,17 +254,17 @@ const ProjectDetailPage: React.FC = () => {
           ))}
         </View>
 
-        {isOwner && Object.keys(candidateStatuses).length > 0 && (
+        {isOwner && applications.length > 0 && (
           <View className={styles.section}>
             <View className={styles.sectionHeader}>
               <Text className={styles.sectionTitle}>候选人状态</Text>
               <Button className={styles.manageBtn} onClick={() => setShowCandidatePanel(true)}>
-                管理
+                管理 ({applications.length})
               </Button>
             </View>
             <View className={styles.candidateSummary}>
               {STATUS_OPTIONS.map(option => {
-                const count = Object.values(candidateStatuses).filter(s => s === option.value).length;
+                const count = applications.filter(app => app.status === option.value).length;
                 if (count === 0) return null;
                 return (
                   <View key={option.value} className={styles.summaryItem}>

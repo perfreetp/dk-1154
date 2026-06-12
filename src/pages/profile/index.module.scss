@@ -277,6 +277,15 @@
   background: $color-bg-hover;
 }
 
+.expiredTag {
+  font-size: $font-size-xs;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+  background: rgba($color-error, 0.1);
+  color: $color-error;
+  font-weight: $font-weight-semibold;
+}
+
 .projectDesc {
   font-size: $font-size-sm;
   color: $color-text-secondary;
