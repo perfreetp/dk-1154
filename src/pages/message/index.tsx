@@ -1,14 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, Button, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { Message } from '../../types/message';
-import { mockMessages } from '../../data/mock-messages';
+import { store, CandidateStatus } from '../../store';
 import EmptyState from '../../components/EmptyState';
 import styles from './index.module.scss';
 
+const STATUS_OPTIONS: { value: CandidateStatus; label: string; color: string }[] = [
+  { value: 'uncontacted', label: '未联系', color: '#94A3B8' },
+  { value: 'preliminary', label: '初步沟通', color: '#5B86E5' },
+  { value: 'deep', label: '深入洽谈', color: '#10B981' },
+  { value: 'teamed', label: '已组队', color: '#F59E0B' }
+];
+
 const MessagePage: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>(mockMessages);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [selectedTab, setSelectedTab] = useState<'all' | 'invite' | 'system'>('all');
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+  const [currentStatus, setCurrentStatus] = useState<CandidateStatus>('uncontacted');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadMessages();
+  }, []);
+
+  const loadMessages = async () => {
+    setLoading(true);
+    try {
+      const msgs = await store.getMessages();
+      setMessages(msgs);
+    } catch (error) {
+      console.error('Failed to load messages:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredMessages = messages.filter(msg => {
     if (selectedTab === 'all') return true;
@@ -17,18 +44,53 @@ const MessagePage: React.FC = () => {
     return true;
   });
 
-  const handleMessageClick = (msg: Message) => {
+  const handleMessageClick = async (msg: Message) => {
     if (!msg.isRead) {
+      await store.markMessageRead(msg.id);
       setMessages(prev => prev.map(m =>
         m.id === msg.id ? { ...m, isRead: true } : m
       ));
     }
 
-    if (msg.type === 'invite') {
+    if (msg.type === 'invite' && msg.data?.projectId) {
       Taro.navigateTo({
-        url: `/pages/project-detail/index?id=${msg.data?.projectId}`
+        url: `/pages/project-detail/index?id=${msg.data.projectId}&candidateId=${msg.fromUserId}`
       });
     }
+  };
+
+  const handleStatusClick = (msg: Message, e: any) => {
+    e.stopPropagation();
+    setSelectedMessage(msg);
+    if (msg.fromUserId && msg.data?.projectId) {
+      loadCandidateStatus(msg.data.projectId, msg.fromUserId);
+    }
+    setShowStatusModal(true);
+  };
+
+  const loadCandidateStatus = async (projectId: string, candidateId: string) => {
+    const status = await store.getCandidateStatus(projectId, candidateId);
+    setCurrentStatus(status);
+  };
+
+  const handleStatusChange = async (status: CandidateStatus) => {
+    if (selectedMessage && selectedMessage.fromUserId && selectedMessage.data?.projectId) {
+      await store.updateCandidateStatus(
+        selectedMessage.data.projectId,
+        selectedMessage.fromUserId,
+        status
+      );
+      setCurrentStatus(status);
+      Taro.showToast({
+        title: '状态已更新',
+        icon: 'success'
+      });
+      setShowStatusModal(false);
+    }
+  };
+
+  const getStatusInfo = (status: CandidateStatus) => {
+    return STATUS_OPTIONS.find(s => s.value === status) || STATUS_OPTIONS[0];
   };
 
   const getTypeIcon = (type: string) => {
@@ -41,6 +103,57 @@ const MessagePage: React.FC = () => {
   };
 
   const unreadCount = messages.filter(m => !m.isRead).length;
+
+  if (showStatusModal && selectedMessage) {
+    return (
+      <View className={styles.page}>
+        <View className={styles.statusHeader}>
+          <Button className={styles.closeBtn} onClick={() => setShowStatusModal(false)}>
+            <Text style={{ fontSize: '36rpx' }}>←</Text>
+          </Button>
+          <Text className={styles.statusTitle}>候选人状态</Text>
+          <View style={{ width: '80rpx' }} />
+        </View>
+
+        <View className={styles.statusContent}>
+          <View className={styles.candidateInfo}>
+            <Image
+              src={selectedMessage.fromUserAvatar || ''}
+              className={styles.candidateAvatar}
+              mode='aspectFill'
+            />
+            <Text className={styles.candidateName}>{selectedMessage.fromUserName}</Text>
+          </View>
+
+          <Text className={styles.currentStatusLabel}>当前状态</Text>
+          <View className={styles.currentStatus} style={{ borderColor: getStatusInfo(currentStatus).color }}>
+            <Text style={{ color: getStatusInfo(currentStatus).color, fontWeight: '600' }}>
+              {getStatusInfo(currentStatus).label}
+            </Text>
+          </View>
+
+          <Text className={styles.selectLabel}>修改状态</Text>
+          <View className={styles.statusOptions}>
+            {STATUS_OPTIONS.map(option => (
+              <View
+                key={option.value}
+                className={`${styles.statusOption} ${currentStatus === option.value ? styles.active : ''}`}
+                style={{
+                  borderColor: option.color,
+                  backgroundColor: currentStatus === option.value ? `${option.color}15` : 'transparent'
+                }}
+                onClick={() => handleStatusChange(option.value)}
+              >
+                <Text style={{ color: option.color, fontWeight: currentStatus === option.value ? '600' : '400' }}>
+                  {option.label}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View className={styles.page}>
@@ -70,7 +183,11 @@ const MessagePage: React.FC = () => {
       </View>
 
       <ScrollView scrollY className={styles.messageList}>
-        {filteredMessages.length > 0 ? (
+        {loading ? (
+          <View style={{ textAlign: 'center', padding: '100rpx 0' }}>
+            <Text style={{ color: '#94A3B8' }}>加载中...</Text>
+          </View>
+        ) : filteredMessages.length > 0 ? (
           filteredMessages.map(msg => (
             <View
               key={msg.id}
@@ -96,6 +213,12 @@ const MessagePage: React.FC = () => {
                 </View>
                 <Text className={styles.messageText}>{msg.content}</Text>
               </View>
+
+              {msg.type === 'invite' && msg.fromUserId && (
+                <View className={styles.statusBtn} onClick={(e) => handleStatusClick(msg, e)}>
+                  <Text className={styles.statusBtnText}>状态</Text>
+                </View>
+              )}
 
               {msg.fromUserAvatar && (
                 <Image

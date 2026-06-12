@@ -159,3 +159,105 @@
   border-radius: $radius-round;
   margin-left: $spacing-md;
 }
+
+.statusBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80rpx;
+  height: 48rpx;
+  background: $color-bg-hover;
+  border-radius: $radius-button;
+  margin-left: $spacing-sm;
+}
+
+.statusBtnText {
+  font-size: $font-size-xs;
+  color: $color-primary;
+}
+
+.statusHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: $gradient-primary;
+  padding: $spacing-lg $page-padding;
+  padding-top: calc(env(safe-area-inset-top) + 20rpx);
+}
+
+.closeBtn {
+  @include button-reset;
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.statusTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+}
+
+.statusContent {
+  padding: $spacing-lg $page-padding;
+}
+
+.candidateInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-lg;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  margin-bottom: $spacing-lg;
+}
+
+.candidateAvatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: $radius-round;
+  margin-bottom: $spacing-md;
+}
+
+.candidateName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.currentStatusLabel,
+.selectLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+}
+
+.currentStatus {
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  text-align: center;
+  border: 2rpx solid;
+  margin-bottom: $spacing-lg;
+}
+
+.statusOptions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.statusOption {
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  text-align: center;
+  border: 2rpx solid;
+  transition: all $transition-base;
+
+  &.active {
+    border-width: 3rpx;
+  }
+}

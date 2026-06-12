@@ -71,7 +71,7 @@ const CalendarPage: React.FC = () => {
       </View>
 
       <ScrollView scrollY className={styles.resourceList}>
-        <View style={{ padding: `0 ${$page-padding}` }}>
+        <View style={{ padding: '0 32rpx' }}>
           {filteredResources.map(resource => (
             <View key={resource.id} className={styles.resourceCard}>
               <View className={styles.cardHeader}>

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, PullDownRefresh } from '@tarojs/components';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, ScrollView } from '@tarojs/components';
 import Taro, { usePullDownRefresh } from '@tarojs/taro';
-import { Project, STAGE_OPTIONS } from '../../types/project';
-import { mockProjects } from '../../data/mock-projects';
+import { STAGE_OPTIONS } from '../../types/project';
+import { store } from '../../store';
 import ProjectCard from '../../components/ProjectCard';
 import SearchBar from '../../components/SearchBar';
 import FilterBar from '../../components/FilterBar';
@@ -10,14 +10,29 @@ import EmptyState from '../../components/EmptyState';
 import styles from './index.module.scss';
 
 const SquarePage: React.FC = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
+  const [filteredProjects, setFilteredProjects] = useState<any[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const [selectedStage, setSelectedStage] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  const loadProjects = useCallback(async () => {
+    try {
+      setLoading(true);
+      await store.checkExpiredProjects();
+      const activeProjects = await store.getActiveProjects();
+      setProjects(activeProjects);
+      Taro.stopPullDownRefresh();
+    } catch (error) {
+      console.error('[Square] Failed to load projects:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     loadProjects();
-  }, []);
+  }, [loadProjects]);
 
   useEffect(() => {
     filterProjects();
@@ -27,14 +42,14 @@ const SquarePage: React.FC = () => {
     loadProjects();
   });
 
-  const loadProjects = () => {
-    try {
-      setProjects(mockProjects);
-      Taro.stopPullDownRefresh();
-    } catch (error) {
-      console.error('[Square] Failed to load projects:', error);
+  useEffect(() => {
+    const eventChannel = Taro.getCurrentInstance().page?.getOpenerEventChannel();
+    if (eventChannel) {
+      eventChannel.on('onProjectPublished', () => {
+        loadProjects();
+      });
     }
-  };
+  }, [loadProjects]);
 
   const filterProjects = () => {
     let filtered = [...projects];
@@ -53,10 +68,14 @@ const SquarePage: React.FC = () => {
     setFilteredProjects(filtered);
   };
 
-  const handleCollect = (id: string) => {
-    setProjects(prev => prev.map(p =>
-      p.id === id ? { ...p, isCollected: !p.isCollected } : p
-    ));
+  const handleCollect = async (id: string) => {
+    const project = projects.find(p => p.id === id);
+    if (project) {
+      await store.updateProject(id, { isCollected: !project.isCollected });
+      setProjects(prev => prev.map(p =>
+        p.id === id ? { ...p, isCollected: !p.isCollected } : p
+      ));
+    }
   };
 
   const handlePublish = () => {
@@ -88,8 +107,12 @@ const SquarePage: React.FC = () => {
           className={styles.scrollView}
           style={{ height: 'calc(100vh - 400rpx)' }}
         >
-          <View style={{ padding: `0 ${$page-padding}` }}>
-            {filteredProjects.length > 0 ? (
+          <View style={{ padding: '0 32rpx' }}>
+            {loading ? (
+              <View style={{ textAlign: 'center', padding: '100rpx 0' }}>
+                <Text style={{ color: '#94A3B8' }}>加载中...</Text>
+              </View>
+            ) : filteredProjects.length > 0 ? (
               filteredProjects.map(project => (
                 <ProjectCard
                   key={project.id}

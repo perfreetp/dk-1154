@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, Input, Button, ScrollView, Checkbox } from '@tarojs/components';
+import { View, Text, Input, Button, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { COLLEGE_OPTIONS, SKILL_TAGS, STAGE_OPTIONS } from '../../types/project';
+import { store } from '../../store';
+import { mockUsers } from '../../data/mock-users';
 import styles from './index.module.scss';
 
 const PublishPage: React.FC = () => {
@@ -14,7 +16,7 @@ const PublishPage: React.FC = () => {
     roles: [{ name: '', required: 1 }]
   });
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.title.trim()) {
       Taro.showToast({ title: '请输入项目名称', icon: 'none' });
       return;
@@ -32,17 +34,63 @@ const PublishPage: React.FC = () => {
       return;
     }
 
+    const validRoles = formData.roles.filter(r => r.name.trim());
+    if (validRoles.length === 0) {
+      Taro.showToast({ title: '请至少添加一个招募角色', icon: 'none' });
+      return;
+    }
+
     Taro.showLoading({ title: '发布中...' });
-    setTimeout(() => {
+    try {
+      const currentUser = mockUsers[0];
+      const now = new Date();
+      const expiredAt = new Date();
+      expiredAt.setDate(expiredAt.getDate() + 30);
+
+      const newProject = {
+        id: store.generateId(),
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        stage: formData.stage,
+        college: formData.college,
+        tags: formData.tags,
+        roles: validRoles.map(r => ({
+          name: r.name,
+          required: r.required,
+          current: 0
+        })),
+        creatorId: 'currentUser',
+        creatorName: currentUser.name,
+        creatorAvatar: currentUser.avatar,
+        status: 'active' as const,
+        isCollected: false,
+        createdAt: now.toISOString().split('T')[0],
+        expiredAt: expiredAt.toISOString().split('T')[0],
+        viewCount: 0,
+        applyCount: 0
+      };
+
+      await store.addProject(newProject);
+
       Taro.hideLoading();
       Taro.showToast({
         title: '发布成功',
         icon: 'success'
       });
+
+      const eventChannel = Taro.getCurrentInstance().page?.getOpenerEventChannel();
+      if (eventChannel) {
+        eventChannel.emit('onProjectPublished');
+      }
+
       setTimeout(() => {
         Taro.switchTab({ url: '/pages/square/index' });
       }, 1500);
-    }, 1000);
+    } catch (error) {
+      Taro.hideLoading();
+      Taro.showToast({ title: '发布失败', icon: 'none' });
+      console.error('Failed to publish project:', error);
+    }
   };
 
   const toggleTag = (tag: string) => {

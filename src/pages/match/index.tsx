@@ -76,7 +76,7 @@ const MatchPage: React.FC = () => {
       </View>
 
       <ScrollView scrollY className={styles.userList}>
-        <View style={{ padding: `0 ${$page-padding}` }}>
+        <View style={{ padding: '0 32rpx' }}>
           {filteredUsers.length > 0 ? (
             filteredUsers.map(user => (
               <View key={user.id} className={styles.userCard}>

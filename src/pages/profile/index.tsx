@@ -1,25 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, Button, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
-import { User, Review } from '../../types/user';
+import { User } from '../../types/user';
+import { store } from '../../store';
 import { mockUsers } from '../../data/mock-users';
+import EmptyState from '../../components/EmptyState';
 import styles from './index.module.scss';
 
 const ProfilePage: React.FC = () => {
   const [currentUser] = useState<User>(mockUsers[0]);
-  const [reviews] = useState<Review[]>([]);
+  const [myProjects, setMyProjects] = useState<any[]>([]);
+  const [showMyProjects, setShowMyProjects] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const menuItems = [
-    { icon: '📋', label: '我的项目', count: 3 },
+    { icon: '📋', label: '我的项目', count: myProjects.length },
     { icon: '⭐', label: '我的收藏', count: 5 },
     { icon: '📝', label: '待评价', count: 2 },
     { icon: '⚙️', label: '设置', count: 0 }
   ];
 
-  const handleMenuClick = (label: string) => {
+  useEffect(() => {
+    loadMyProjects();
+  }, []);
+
+  const loadMyProjects = async () => {
+    setLoading(true);
+    try {
+      const projects = await store.getMyProjects();
+      setMyProjects(projects);
+    } catch (error) {
+      console.error('Failed to load my projects:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMenuClick = async (label: string) => {
     switch (label) {
       case '我的项目':
-        Taro.showToast({ title: '我的项目', icon: 'none' });
+        await loadMyProjects();
+        setShowMyProjects(true);
         break;
       case '我的收藏':
         Taro.switchTab({ url: '/pages/square/index' });
@@ -32,6 +53,163 @@ const ProfilePage: React.FC = () => {
         break;
     }
   };
+
+  const handleHideProject = async (projectId: string) => {
+    Taro.showModal({
+      title: '确认隐藏',
+      content: '确定要隐藏此项目吗？隐藏后项目将从广场下架，但可以在"我的项目"中恢复。',
+      success: async (res) => {
+        if (res.confirm) {
+          await store.hideProject(projectId);
+          Taro.showToast({ title: '已隐藏', icon: 'success' });
+          loadMyProjects();
+        }
+      }
+    });
+  };
+
+  const handleShowProject = async (projectId: string) => {
+    Taro.showModal({
+      title: '确认恢复',
+      content: '确定要恢复显示此项目吗？',
+      success: async (res) => {
+        if (res.confirm) {
+          await store.showProject(projectId);
+          Taro.showToast({ title: '已恢复', icon: 'success' });
+          loadMyProjects();
+        }
+      }
+    });
+  };
+
+  const handleExtendProject = async (projectId: string) => {
+    Taro.showModal({
+      title: '延长有效期',
+      content: '确定要延长此项目30天有效期吗？',
+      success: async (res) => {
+        if (res.confirm) {
+          await store.extendProjectExpiry(projectId, 30);
+          Taro.showToast({ title: '已延长30天', icon: 'success' });
+          loadMyProjects();
+        }
+      }
+    });
+  };
+
+  const handleDeleteProject = async (projectId: string) => {
+    Taro.showModal({
+      title: '确认删除',
+      content: '确定要删除此项目吗？此操作不可恢复。',
+      success: async (res) => {
+        if (res.confirm) {
+          const projects = await store.getProjects();
+          const filtered = projects.filter(p => p.id !== projectId);
+          await store.saveProjects(filtered);
+          Taro.showToast({ title: '已删除', icon: 'success' });
+          loadMyProjects();
+        }
+      }
+    });
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'active': return '展示中';
+      case 'hidden': return '已隐藏';
+      case 'expired': return '已过期';
+      default: return status;
+    }
+  };
+
+  const getStatusStyle = (status: string) => {
+    switch (status) {
+      case 'active': return { color: '#10B981' };
+      case 'hidden': return { color: '#94A3B8' };
+      case 'expired': return { color: '#EF4444' };
+      default: return {};
+    }
+  };
+
+  if (showMyProjects) {
+    return (
+      <View className={styles.page}>
+        <View className={styles.myProjectsHeader}>
+          <Button className={styles.backBtn} onClick={() => setShowMyProjects(false)}>
+            <Text style={{ fontSize: '36rpx' }}>←</Text>
+          </Button>
+          <Text className={styles.headerTitle}>我的项目</Text>
+          <View style={{ width: '80rpx' }} />
+        </View>
+
+        <ScrollView scrollY className={styles.projectsList}>
+          {loading ? (
+            <View style={{ textAlign: 'center', padding: '100rpx 0' }}>
+              <Text style={{ color: '#94A3B8' }}>加载中...</Text>
+            </View>
+          ) : myProjects.length > 0 ? (
+            myProjects.map(project => (
+              <View key={project.id} className={styles.projectCard}>
+                <View className={styles.projectHeader}>
+                  <View className={styles.projectInfo}>
+                    <Text className={styles.projectTitle}>{project.title}</Text>
+                    <Text style={{ ...styles.projectStatus, ...getStatusStyle(project.status) }}>
+                      {getStatusText(project.status)}
+                    </Text>
+                  </View>
+                  <Text style={{ fontSize: '24rpx', color: '#94A3B8' }}>
+                    {project.expiredAt ? `有效期至 ${project.expiredAt}` : ''}
+                  </Text>
+                </View>
+
+                <Text className={styles.projectDesc}>{project.description}</Text>
+
+                <View className={styles.projectTags}>
+                  {project.tags.map((tag: string, idx: number) => (
+                    <Text key={idx} className={styles.tag}>{tag}</Text>
+                  ))}
+                </View>
+
+                <View className={styles.projectActions}>
+                  {project.status === 'active' && (
+                    <Button
+                      className={styles.actionBtn}
+                      onClick={() => handleHideProject(project.id)}
+                    >
+                      隐藏
+                    </Button>
+                  )}
+                  {project.status === 'hidden' && (
+                    <Button
+                      className={styles.actionBtn}
+                      onClick={() => handleShowProject(project.id)}
+                    >
+                      恢复显示
+                    </Button>
+                  )}
+                  {project.status === 'expired' && (
+                    <Button
+                      className={styles.actionBtn}
+                      onClick={() => handleExtendProject(project.id)}
+                    >
+                      延长30天
+                    </Button>
+                  )}
+                  <Button
+                    className={styles.deleteBtn}
+                    onClick={() => handleDeleteProject(project.id)}
+                  >
+                    删除
+                  </Button>
+                </View>
+              </View>
+            ))
+          ) : (
+            <EmptyState message='暂无项目，快去发布一个吧~' />
+          )}
+        </ScrollView>
+      </View>
+    );
+  }
 
   return (
     <View className={styles.page}>

@@ -212,3 +212,113 @@
   font-size: $font-size-xl;
   color: $color-text-tertiary;
 }
+
+.myProjectsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: $gradient-primary;
+  padding: $spacing-lg $page-padding;
+  padding-top: calc(env(safe-area-inset-top) + 20rpx);
+}
+
+.backBtn {
+  @include button-reset;
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.headerTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+}
+
+.projectsList {
+  height: calc(100vh - 120rpx);
+  padding: $spacing-md $page-padding;
+}
+
+.projectCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.projectHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: $spacing-sm;
+}
+
+.projectInfo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.projectTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.projectStatus {
+  font-size: $font-size-xs;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+  background: $color-bg-hover;
+}
+
+.projectDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-md;
+  @include text-ellipsis-multi(2);
+}
+
+.projectTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-md;
+}
+
+.tag {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  background: rgba($color-primary, 0.1);
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+}
+
+.projectActions {
+  display: flex;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+}
+
+.actionBtn {
+  @include button-reset;
+  padding: 12rpx 24rpx;
+  background: $color-primary;
+  border-radius: $radius-button;
+  font-size: $font-size-xs;
+  color: $color-text-white;
+}
+
+.deleteBtn {
+  @include button-reset;
+  padding: 12rpx 24rpx;
+  background: $color-bg-hover;
+  border-radius: $radius-button;
+  font-size: $font-size-xs;
+  color: $color-error;
+}
