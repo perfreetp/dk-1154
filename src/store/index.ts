@@ -45,6 +45,7 @@ export interface Application {
   note?: string;
   intendedRole?: string;
   nextMeetTime?: string;
+  lastUpdated?: string;
 }
 
 export interface CandidateStatusRecord {
@@ -315,6 +316,7 @@ class Store {
     const index = applications.findIndex(a => a.applicantId === applicantId);
     if (index !== -1) {
       applications[index].status = status;
+      applications[index].lastUpdated = new Date().toISOString();
       await this.saveApplications(projectId, applications);
       await this.updateCandidateStatus(projectId, applicantId, status);
     }
@@ -341,6 +343,7 @@ class Store {
       if (updates.nextMeetTime !== undefined) {
         applications[index].nextMeetTime = updates.nextMeetTime;
       }
+      applications[index].lastUpdated = new Date().toISOString();
       await this.saveApplications(projectId, applications);
     }
   }

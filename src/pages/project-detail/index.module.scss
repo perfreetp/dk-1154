@@ -641,3 +641,38 @@
   font-weight: $font-weight-semibold;
   margin-top: $spacing-md;
 }
+
+.filterBar {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+  padding: $spacing-sm 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.filterItem {
+  flex-shrink: 0;
+  padding: 8rpx 20rpx;
+  border-radius: $radius-button;
+  background: $color-bg-hover;
+  transition: all $transition-base;
+
+  &.active {
+    background: rgba($color-primary, 0.1);
+  }
+}
+
+.filterText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+
+  &.activeText {
+    font-weight: $font-weight-medium;
+  }
+}

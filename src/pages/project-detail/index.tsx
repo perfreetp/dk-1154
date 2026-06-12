@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, Image, Button, ScrollView } from '@tarojs/components';
-import Taro, { useRouter } from '@tarojs/taro';
+import Taro, { useRouter, useDidShow } from '@tarojs/taro';
 import { Project, STAGE_OPTIONS } from '../../types/project';
 import { store, CandidateStatus, Application, Meeting } from '../../store';
 import styles from './index.module.scss';
@@ -18,38 +18,56 @@ const ProjectDetailPage: React.FC = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [selectedCandidate, setSelectedCandidate] = useState<Application | null>(null);
   const [latestMeetings, setLatestMeetings] = useState<{[key: string]: Meeting | null}>({});
+  const [filterStatus, setFilterStatus] = useState<CandidateStatus | 'all'>('all');
 
-  useEffect(() => {
-    loadProject();
-  }, [router.params]);
-
-  useEffect(() => {
-    if (project) {
-      loadApplications();
-    }
-  }, [project]);
-
-  const loadProject = async () => {
+  const loadProject = useCallback(async () => {
     const { id } = router.params;
     const projects = await store.getProjects();
     const foundProject = projects.find(p => p.id === id);
     if (foundProject) {
       setProject(foundProject);
     }
-  };
+  }, [router.params]);
 
-  const loadApplications = async () => {
+  const loadApplications = useCallback(async () => {
     if (!project) return;
     const apps = await store.getApplications(project.id);
     setApplications(apps);
     
     const meetings: {[key: string]: Meeting | null} = {};
+    const now = new Date();
     for (const app of apps) {
-      const latest = await store.getLatestMeeting(project.id, app.applicantId);
-      meetings[app.applicantId] = latest;
+      const allMeetings = await store.getMeetings(project.id);
+      const candidateMeetings = allMeetings
+        .filter(m => m.candidateId === app.applicantId)
+        .filter(m => new Date(m.meetTime) >= now || m.status === 'pending')
+        .sort((a, b) => new Date(a.meetTime).getTime() - new Date(b.meetTime).getTime());
+      meetings[app.applicantId] = candidateMeetings.length > 0 ? candidateMeetings[0] : null;
     }
     setLatestMeetings(meetings);
-  };
+  }, [project]);
+
+  useEffect(() => {
+    loadProject();
+  }, [loadProject]);
+
+  useEffect(() => {
+    if (project) {
+      loadApplications();
+    }
+  }, [project, loadApplications]);
+
+  useDidShow(() => {
+    if (project) {
+      loadApplications();
+      if (selectedCandidate) {
+        const updated = applications.find(a => a.applicantId === selectedCandidate.applicantId);
+        if (updated) {
+          setSelectedCandidate(updated);
+        }
+      }
+    }
+  });
 
   const handleCollect = async () => {
     if (!project) return;
@@ -192,8 +210,8 @@ const ProjectDetailPage: React.FC = () => {
             <View className={styles.candidateDetailRow}>
               <Text className={styles.detailLabel}>下次约聊</Text>
               <Text className={styles.detailValue}>
-                {selectedCandidate.nextMeetTime 
-                  ? new Date(selectedCandidate.nextMeetTime).toLocaleString('zh-CN')
+                {latestMeetings[selectedCandidate.applicantId]
+                  ? new Date(latestMeetings[selectedCandidate.applicantId]!.meetTime).toLocaleString('zh-CN')
                   : '未安排'}
               </Text>
             </View>
@@ -366,9 +384,33 @@ const ProjectDetailPage: React.FC = () => {
                   })}
                 </View>
 
+                <View className={styles.filterBar}>
+                  <View
+                    className={`${styles.filterItem} ${filterStatus === 'all' ? styles.active : ''}`}
+                    onClick={() => setFilterStatus('all')}
+                  >
+                    <Text className={`${styles.filterText} ${filterStatus === 'all' ? styles.activeText : ''}`}>全部</Text>
+                  </View>
+                  {STATUS_OPTIONS.map(option => (
+                    <View
+                      key={option.value}
+                      className={`${styles.filterItem} ${filterStatus === option.value ? styles.active : ''}`}
+                      onClick={() => setFilterStatus(option.value)}
+                    >
+                      <Text className={`${styles.filterText} ${filterStatus === option.value ? styles.activeText : ''}`}
+                        style={{ color: filterStatus === option.value ? option.color : undefined }}>
+                        {option.label}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+
                 <View className={styles.candidateList}>
-                  {applications.map(app => {
+                  {applications
+                    .filter(app => filterStatus === 'all' || app.status === filterStatus)
+                    .map(app => {
                     const statusInfo = getStatusInfo(app.status);
+                    const nextMeeting = latestMeetings[app.applicantId];
                     return (
                       <View 
                         key={app.applicantId} 
@@ -396,10 +438,10 @@ const ProjectDetailPage: React.FC = () => {
                           </View>
                         </View>
 
-                        {app.nextMeetTime && (
+                        {nextMeeting && (
                           <View className={styles.nextMeetTime}>
                             <Text style={{ fontSize: '24rpx', color: '#5B86E5' }}>
-                              📅 下次约聊：{new Date(app.nextMeetTime).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                              📅 下次约聊：{new Date(nextMeeting.meetTime).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                             </Text>
                           </View>
                         )}
@@ -428,6 +470,15 @@ const ProjectDetailPage: React.FC = () => {
                     );
                   })}
                 </View>
+
+                {applications.filter(app => filterStatus === 'all' || app.status === filterStatus).length === 0 && (
+                  <View className={styles.emptyState}>
+                    <Text className={styles.emptyText}>暂无符合条件的候选人</Text>
+                    <Button className={styles.inviteBtn} onClick={handleInvite}>
+                      去邀请搭子
+                    </Button>
+                  </View>
+                )}
               </>
             ) : (
               <View className={styles.emptyState}>

@@ -250,6 +250,10 @@
   box-shadow: $shadow-card;
 }
 
+.projectContent {
+  margin-bottom: $spacing-md;
+}
+
 .projectHeader {
   display: flex;
   justify-content: space-between;

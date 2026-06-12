@@ -75,12 +75,21 @@ const MessagePage: React.FC = () => {
 
   const handleStatusChange = async (status: CandidateStatus) => {
     if (selectedMessage && selectedMessage.fromUserId && selectedMessage.data?.projectId) {
-      await store.updateCandidateStatus(
+      await store.updateApplicationStatus(
         selectedMessage.data.projectId,
         selectedMessage.fromUserId,
         status
       );
       setCurrentStatus(status);
+      setMessages(prev => prev.map(m => {
+        if (m.id === selectedMessage.id) {
+          return {
+            ...m,
+            data: { ...m.data, lastUpdated: new Date().toISOString() }
+          };
+        }
+        return m;
+      }));
       Taro.showToast({
         title: '状态已更新',
         icon: 'success'

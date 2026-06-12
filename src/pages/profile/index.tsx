@@ -167,34 +167,42 @@ const ProfilePage: React.FC = () => {
           ) : myProjects.length > 0 ? (
             myProjects.map(project => (
               <View key={project.id} className={styles.projectCard}>
-                <View className={styles.projectHeader}>
-                  <View className={styles.projectInfo}>
-                    <Text className={styles.projectTitle}>{project.title}</Text>
-                    {project.status === 'expired' && (
-                      <Text className={styles.expiredTag}>已过期</Text>
-                    )}
-                    <Text style={{ ...styles.projectStatus, ...getStatusStyle(project.status) }}>
-                      {getStatusText(project.status)}
+                <View 
+                  className={styles.projectContent}
+                  onClick={() => Taro.navigateTo({ url: `/pages/project-detail/index?id=${project.id}` })}
+                >
+                  <View className={styles.projectHeader}>
+                    <View className={styles.projectInfo}>
+                      <Text className={styles.projectTitle}>{project.title}</Text>
+                      {project.status === 'expired' && (
+                        <Text className={styles.expiredTag}>已过期</Text>
+                      )}
+                      <Text style={{ ...styles.projectStatus, ...getStatusStyle(project.status) }}>
+                        {getStatusText(project.status)}
+                      </Text>
+                    </View>
+                    <Text style={{ fontSize: '24rpx', color: '#94A3B8' }}>
+                      {project.expiredAt ? `有效期至 ${project.expiredAt}` : ''}
                     </Text>
                   </View>
-                  <Text style={{ fontSize: '24rpx', color: '#94A3B8' }}>
-                    {project.expiredAt ? `有效期至 ${project.expiredAt}` : ''}
-                  </Text>
-                </View>
 
-                <Text className={styles.projectDesc}>{project.description}</Text>
+                  <Text className={styles.projectDesc}>{project.description}</Text>
 
-                <View className={styles.projectTags}>
-                  {project.tags.map((tag: string, idx: number) => (
-                    <Text key={idx} className={styles.tag}>{tag}</Text>
-                  ))}
+                  <View className={styles.projectTags}>
+                    {project.tags.map((tag: string, idx: number) => (
+                      <Text key={idx} className={styles.tag}>{tag}</Text>
+                    ))}
+                  </View>
                 </View>
 
                 <View className={styles.projectActions}>
                   {project.status === 'active' && (
                     <Button
                       className={styles.actionBtn}
-                      onClick={() => handleHideProject(project.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleHideProject(project.id);
+                      }}
                     >
                       隐藏
                     </Button>
@@ -202,7 +210,10 @@ const ProfilePage: React.FC = () => {
                   {project.status === 'hidden' && (
                     <Button
                       className={styles.actionBtn}
-                      onClick={() => handleShowProject(project.id, project.expiredAt)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleShowProject(project.id, project.expiredAt);
+                      }}
                     >
                       恢复显示
                     </Button>
@@ -210,14 +221,20 @@ const ProfilePage: React.FC = () => {
                   {project.status === 'expired' && (
                     <Button
                       className={styles.actionBtn}
-                      onClick={() => handleExtendProject(project.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleExtendProject(project.id);
+                      }}
                     >
                       延长30天
                     </Button>
                   )}
                   <Button
                     className={styles.deleteBtn}
-                    onClick={() => handleDeleteProject(project.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteProject(project.id);
+                    }}
                   >
                     删除
                   </Button>
